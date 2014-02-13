@@ -13,7 +13,7 @@
 --                  enableICMPIn
 --                  enableICMPOut
 --
---	DATE:       February 3, 2014
+--	DATE:       February 13, 2014
 --
 --	REVISIONS:  (Date and Description)
 --
@@ -139,23 +139,29 @@ def main():
 	while True:
 		os.system("clear")
 		print("R - run script")
-		print("\n==TCP Ports==")
-		for i in tcpPorts:
+		print("\n==TCP Ports >>==")
+		for i in tcpPortsIn:
 			print(i + " ")
-		print("\n==TCP-ACK Ports==")
-		for i in ackPorts:
+		print("\n==TCP Ports <<==")
+		for i in tcpPortsOut:
 			print(i + " ")
-		print("\n==UDP Ports==")
-		for i in udpPorts:
+		print("\n==UDP Ports >>==")
+		for i in udpPortsIn:
 			print(i + " ")
-		print("\n==ICMP Types==")
-		for i in icmpTypes:
+		print("\n==UDP Ports <<==")
+		for i in udpPortsOut:
+			print(i + " ")
+		print("\n==ICMP Types >>==")
+		for i in icmpTypesIn:
+			print(i + " ")
+		print("\n==ICMP Types <<==")
+		for i in icmpTypesOut:
 			print(i + " ")
 		print("\nSelect a command: ")
 
 		choice = raw_input()
 		
-		if choice == 'R' or choice == "r":
+		if choice == 'R' or choice == 'r':
 			#setupForwarding("192.168.10.1", "192.168.0.100")
 			firewallInit()
 			createUserChains()
