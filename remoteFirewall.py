@@ -35,16 +35,12 @@ outputInt="p3p1"
 tcpPortsIn = ["59"]
 tcpPortsOut = ["59"]
 ackPorts = ["59"]
-udpPorts = ["59"]
+udpPortsIn = ["59"]
+udpPortsOut = ["59"]
 icmpTypes = ["59"]
 """
 User Defined Section
 """
-
-for (i)
-	iptables going to internal network allow tcp[i]
-	iptables going to external netwrk allows tcp[i]
-	
 
 internalIP = "192.168.10.0/24"
 externalIP = "192.168.0.11" 
@@ -115,15 +111,16 @@ def enableTCPPort(port):
 	os.system(arg3)
 	os.system(arg4)
 
-def enableUDPPort(port):
-	arg1 = "iptables -A INPUT -p udp --sport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT"
-	arg2 = "iptables -A INPUT -p udp --dport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT"
-	arg3 = "iptables -A OUTPUT -p udp --sport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT"
-	arg4 = "iptables -A OUTPUT -p udp --dport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT"
-	os.system(arg1)
-	os.system(arg2)
-	os.system(arg3)
-	os.system(arg4)
+
+#jake
+def enableUDPPortOut(port):
+	os.system("iptables -A FORWARD -o " + outputInt + " -i " + inputInt + " -p udp --dport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
+	os.system("iptables -A FORWARD -o " + inputInt + "  -i " + outputInt + " -p udp --sport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
+
+#jake
+def enableUDPPortIn(port):
+	os.system("iptables -A FORWARD -o " + outputInt + " -i " + inputInt + " -p udp --sport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
+	os.system("iptables -A FORWARD -o " + inputInt + "  -i " + outputInt + " -p udp --dport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
 	
 def enableICMP(type):
 	arg1 = "iptables -A INPUT -p icmp --icmp-type " + type + " -m state --state NEW,ESTABLISHED -j ACCEPT"
@@ -178,7 +175,9 @@ def main():
 			os.system("iptables -A INPUT -p tcp --syn -j DROP")
 			
 			for i in udpPorts:
-				enableUDPPort(i)
+				enableUDPPortIn(i)
+			for i in udpPorts:
+				enableUDPPortOut(i)
 			for i in tcpPorts:
 				enableTCPPort(i)
 			for i in icmpTypes:
