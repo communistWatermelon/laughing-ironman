@@ -26,15 +26,30 @@
 '''
 import os
 
-def setupForwarding(internalAddress, externalAddress):
-	os.system("ifconfig p3p1 192.168.10.1 up")
-	os.system("echo \"1\" >/proc/sys/net/ipv4/ip_forward")
-	os.system("route add -net 192.168.0.0 netmask 255.255.255.0 gw 192.168.0.8")
-	os.system("route add -net 192.168.10.0/24 gw 192.168.10.1")
+"""
+User Defined Section
+"""
+inputInt="em1"
+outputInt="p3p1"
+tcpPorts = []
+ackPorts = []
+udpPorts = []
+icmpTypes = []
+internalIP = "192.168.10.0/24"
+externalIP = "192.168.0.11" 
+IgatewayIP = "192.168.10.1"
+OgatewayIP = "192.168.0.100"
 
-	os.system("iptables -t nat -A POSTROUTING -o em1 -j MASQUERADE")
-	os.system("iptables -A FORWARD -i em1 -o p3p1 -m state --state  NEW,ESTABLISHED,RELATED -j ACCEPT")
-	os.system("iptables -A FORWARD -i p3p1 -o em1 -m state --state  NEW,ESTABLISHED,RELATED -j ACCEPT")
+
+def setupForwarding():
+	os.system("ifconfig " + outputInt + " " + igatewayIP + " up")
+	os.system("echo \"1\" >/proc/sys/net/ipv4/ip_forward")
+	os.system("route add -net 192.168.0.0 netmask 255.255.255.0 gw")
+	os.system("route add -net " + internalIP + " gw " + IgatewayIP)
+
+	os.system("iptables -t nat -A POSTROUTING -o " + inputInt + " -j MASQUERADE")
+	os.system("iptables -A FORWARD -i " + inputInt + " -o " + outputInt + " -m state --state  NEW,ESTABLISHED,RELATED -j ACCEPT")
+	os.system("iptables -A FORWARD -i " + outputInt + " -o " + inputInt + " -m state --state  NEW,ESTABLISHED,RELATED -j ACCEPT")
 
 def firewallInit():
 	#Clearing old firewall rules
@@ -103,10 +118,6 @@ def enableICMP(type):
 	os.system(arg2)
 
 def main():
-	tcpPorts = []
-	ackPorts = []
-	udpPorts = []
-	icmpTypes = []
 	while True:
 		os.system("clear")
 		print("T - add a TCP port to be forwarded")
