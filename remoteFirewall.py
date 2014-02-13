@@ -168,19 +168,18 @@ def main():
 			firewallInit()
 			createUserChains()
 			
-			for i in ackPorts:
-				enableTCPPort(i)
-			
-			os.system("iptables -A INPUT -p tcp --syn -j DROP")
-			
-			for i in udpPorts:
-				enableUDPPortIn(i)
-			for i in udpPorts:
+			for i in tcpPortsIn:
+				enableTCPPortIn(i)			
+			for i in tcpPortsOut:
+				enableTCPPortOut(i)
+			for i in udpPortsIn:
+				enableUDPPortIn(i)			
+			for i in udpPortsOut:
 				enableUDPPortOut(i)
-			for i in tcpPorts:
-				enableTCPPort(i)
 			for i in icmpTypes:
 				enableICMP(i)
+
+			os.system("iptables -A INPUT -p tcp --syn -j DROP")
 
 			dnsSetup()
 			print("Setup Complete\n")
