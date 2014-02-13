@@ -32,12 +32,24 @@ USER DEFINED SECTION
 """
 inputInt="em1"
 outputInt="p3p1"
+<<<<<<< HEAD
+tcpPortsIn = ["59"]
+tcpPortsOut = ["59"]
+ackPorts = ["59"]
+udpPortsIn = ["59"]
+udpPortsOut = ["59"]
+icmpTypes = ["59"]
+"""
+User Defined Section
+"""
+=======
 tcpPortsIn = ["23", "80", "443"]
 tcpPortsOut = ["23", "80", "443"]
 udpPortsIn = ["59"]
 udpPortsOut = ["59"]
 icmpTypesIn = ["59"]
 icmpTypesOut = ["59"]
+>>>>>>> 3093585ef6170bc5ba242720b05cad1806e421ad
 
 internalIP = "192.168.10.0/24"
 externalIP = "192.168.0.11" 
@@ -112,15 +124,16 @@ def enableTCPPortOut(port):
 	os.system("iptables -A FORWARD -i " + outputInt + " -o " + inputInt  + " -p tcp --sport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
 	os.system("iptables -A FORWARD -i " + inputInt  + " -o " + outputInt + " -p tcp --dport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
 
-def enableUDPPort(port):
-	arg1 = "iptables -A INPUT -p udp --sport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT"
-	arg2 = "iptables -A INPUT -p udp --dport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT"
-	arg3 = "iptables -A OUTPUT -p udp --sport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT"
-	arg4 = "iptables -A OUTPUT -p udp --dport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT"
-	os.system(arg1)
-	os.system(arg2)
-	os.system(arg3)
-	os.system(arg4)
+
+#jake
+def enableUDPPortOut(port):
+	os.system("iptables -A FORWARD -o " + outputInt + " -i " + inputInt + " -p udp --dport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
+	os.system("iptables -A FORWARD -o " + inputInt + "  -i " + outputInt + " -p udp --sport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
+
+#jake
+def enableUDPPortIn(port):
+	os.system("iptables -A FORWARD -o " + outputInt + " -i " + inputInt + " -p udp --sport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
+	os.system("iptables -A FORWARD -o " + inputInt + "  -i " + outputInt + " -p udp --dport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
 	
 def enableICMP(type):
 	arg1 = "iptables -A INPUT -p icmp --icmp-type " + type + " -m state --state NEW,ESTABLISHED -j ACCEPT"
@@ -175,7 +188,9 @@ def main():
 			os.system("iptables -A INPUT -p tcp --syn -j DROP")
 			
 			for i in udpPorts:
-				enableUDPPort(i)
+				enableUDPPortIn(i)
+			for i in udpPorts:
+				enableUDPPortOut(i)
 			for i in tcpPorts:
 				enableTCPPort(i)
 			for i in icmpTypes:
