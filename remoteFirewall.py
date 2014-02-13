@@ -85,16 +85,22 @@ def firewallInit():
 		
 def createUserChains():
 	os.system("iptables -N TCP")
+	os.system("iptables -N UserTCP")
 	os.system("iptables -p tcp -j TCP")
 	os.system("iptables -A TCP")
+	os.system("iptables -A UserTCP")
 	
 	os.system("iptables -N UDP")
+	os.system("iptables -N UserUDP")
 	os.system("iptables -p udp -j UDP")
 	os.system("iptables -A UDP")	
+	os.system("iptables -A UserUDP")
 
 	os.system("iptables -N ICMP")
+	os.system("iptables -N UserICMP")
 	os.system("iptables -p icmp -j ICMP")
 	os.system("iptables -A ICMP")
+	os.system("iptables -A UserICMP")
 
 def dnsSetup():
 	os.system("iptables -A INPUT -p udp --sport 53 -m state --state ESTABLISHED -j ACCEPT")
