@@ -52,9 +52,9 @@ USER DEFINED SECTION
 """
 
 def setupForwarding():
-	os.system("ifconfig " + outputInt + " " + igatewayIP + " up")
+	os.system("ifconfig " + outputInt + " " + IgatewayIP + " up")
 	os.system("echo \"1\" >/proc/sys/net/ipv4/ip_forward")
-	os.system("route add -net 192.168.0.0 netmask 255.255.255.0 gw")
+	os.system("route add -net 192.168.0.0 netmask 255.255.255.0 gw " + OgatewayIP)
 	os.system("route add -net " + internalIP + " gw " + IgatewayIP)
 
 	os.system("iptables -t nat -A POSTROUTING -o " + inputInt + " -j MASQUERADE")
@@ -64,26 +64,23 @@ def setupForwarding():
 def createUserChains():
 	os.system("iptables -N TCP")
 	os.system("iptables -N UserTCP")
-	os.system("iptables -p tcp -j TCP")
+	#os.system("iptables -p tcp -j TCP")
 	os.system("iptables -A TCP")
 	os.system("iptables -A UserTCP")
 	
 	os.system("iptables -N UDP")
 	os.system("iptables -N UserUDP")
-	os.system("iptables -p udp -j UDP")
+	#os.system("iptables -p udp -j UDP")
 	os.system("iptables -A UDP")	
 	os.system("iptables -A UserUDP")
 
 	os.system("iptables -N ICMP")
 	os.system("iptables -N UserICMP")
-	os.system("iptables -p icmp -j ICMP")
+	#os.system("iptables -p icmp -j ICMP")
 	os.system("iptables -A ICMP")
 	os.system("iptables -A UserICMP")
 
 def firewallInit():
-	#Clearing old firewall rules
-	os.system("iptables -F")
-
 	#Setting default Behavior
 	os.system("iptables -P INPUT DROP")
 	os.system("iptables -P OUTPUT DROP")
@@ -100,8 +97,6 @@ def firewallInit():
 	os.system("iptables -A TCP -p tcp --dport 111 -j DROP")
 	os.system("iptables -A TCP -p tcp --dport 515 -j DROP")
 	
-	#Blocking syn+ack packets
-	os.system("iptables -A TCP -p tcp --syn --fin -j DROP")
 	#Blocking all telnet packets
 	os.system("iptables -A TCP -p tcp --sport 23 -j DROP")
 	os.system("iptables -A TCP -p tcp --dport 23 -j DROP")
@@ -132,12 +127,12 @@ def enableUDPPortIn(port):
 	os.system("iptables -A UserUDP -o " + inputInt + "  -i " + outputInt + " -p udp --dport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
 	
 def enableICMPIn(type):
-	os.system("iptables -A UserICMP " + inputInt + " -i " + outputInt + " -p icmp --icmp-type " + type + " -m state --state NEW,ESTABLISHED -j ACCEPT")
-	os.system("iptables -A UserICMP " + outputInt + "  -i " + inputInt + " -p icmp --icmp-type " + type + " -m state --state NEW,ESTABLISHED -j ACCEPT")
+	os.system("iptables -A UserICMP -o " + inputInt + " -i " + outputInt + " -p icmp --icmp-type " + type + " -m state --state NEW,ESTABLISHED -j ACCEPT")
+	os.system("iptables -A UserICMP -o " + outputInt + "  -i " + inputInt + " -p icmp --icmp-type " + type + " -m state --state NEW,ESTABLISHED -j ACCEPT")
 
 def enableICMPOut(type):
-	os.system("iptables -A UserICMP " + outputInt + " -i " + inputInt + " -p icmp --icmp-type " + type + " -m state --state NEW,ESTABLISHED -j ACCEPT")
-	os.system("iptables -A UserICMP " + inputInt + "  -i " + outputInt + " -p icmp --icmp-type " + type + " -m state --state NEW,ESTABLISHED -j ACCEPT")
+	os.system("iptables -A UserICMP -o " + outputInt + " -i " + inputInt + " -p icmp --icmp-type " + type + " -m state --state NEW,ESTABLISHED -j ACCEPT")
+	os.system("iptables -A UserICMP -o " + inputInt + "  -i " + outputInt + " -p icmp --icmp-type " + type + " -m state --state NEW,ESTABLISHED -j ACCEPT")
 
 def main():
 	while True:
@@ -166,6 +161,10 @@ def main():
 		choice = raw_input()
 		
 		if choice == 'R' or choice == 'r':
+			#Clearing old firewall rules
+			os.system("iptables -F")
+			os.system("iptables -X")
+
 			setupForwarding()
 			createUserChains()
 			firewallInit()
@@ -185,7 +184,6 @@ def main():
 
 			os.system("iptables -A INPUT -p tcp --syn -j DROP")
 			os.system("iptables -A FORWARD -i " + inputInt  + " -o " + outputInt + " -p tcp --syn -j DROP")
-
 			dnsSetup()
 			print("Setup Complete\n")
 			break
