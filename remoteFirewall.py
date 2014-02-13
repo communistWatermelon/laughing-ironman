@@ -32,10 +32,20 @@ User Defined Section
 """
 inputInt="em1"
 outputInt="p3p1"
-tcpPorts = []
-ackPorts = []
-udpPorts = []
-icmpTypes = []
+tcpPortsIn = ["59"]
+tcpPortsOut = ["59"]
+ackPorts = ["59"]
+udpPorts = ["59"]
+icmpTypes = ["59"]
+"""
+User Defined Section
+"""
+
+for (i)
+	iptables going to internal network allow tcp[i]
+	iptables going to external netwrk allows tcp[i]
+	
+
 internalIP = "192.168.10.0/24"
 externalIP = "192.168.0.11" 
 IgatewayIP = "192.168.10.1"
@@ -76,16 +86,19 @@ def firewallInit():
 	#Blocking all telnet packets
 	os.system("iptables -p tcp --sport 23 -j DROP")
 	os.system("iptables -p tcp --dport 23 -j DROP")
-	
+		
 def createUserChains():
 	os.system("iptables -N TCP")
 	os.system("iptables -p tcp -j TCP")
+	os.system("iptables -A TCP")
 	
 	os.system("iptables -N UDP")
 	os.system("iptables -p udp -j UDP")
-	
+	os.system("iptables -A UDP")	
+
 	os.system("iptables -N ICMP")
 	os.system("iptables -p icmp -j ICMP")
+	os.system("iptables -A ICMP")
 
 def dnsSetup():
 	os.system("iptables -A INPUT -p udp --sport 53 -m state --state ESTABLISHED -j ACCEPT")
