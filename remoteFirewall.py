@@ -30,26 +30,12 @@ import os
 """
 USER DEFINED SECTION
 """
-inputInt="em1"
-outputInt="p3p1"
-<<<<<<< HEAD
-tcpPortsIn = ["59"]
-tcpPortsOut = ["59"]
-ackPorts = ["59"]
-udpPortsIn = ["59"]
-udpPortsOut = ["59"]
-icmpTypes = ["59"]
-"""
-User Defined Section
-"""
-=======
 tcpPortsIn = ["23", "80", "443"]
 tcpPortsOut = ["23", "80", "443"]
 udpPortsIn = ["59"]
 udpPortsOut = ["59"]
 icmpTypesIn = ["59"]
 icmpTypesOut = ["59"]
->>>>>>> 3093585ef6170bc5ba242720b05cad1806e421ad
 
 internalIP = "192.168.10.0/24"
 externalIP = "192.168.0.11" 
