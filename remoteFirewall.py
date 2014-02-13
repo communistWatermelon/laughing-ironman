@@ -33,6 +33,9 @@ import os
 """
 USER DEFINED SECTION
 """
+inputInt = "em1"
+outputInt = "p3p1"
+
 tcpPortsIn = ["23", "80", "443"]
 tcpPortsOut = ["23", "80", "443"]
 udpPortsIn = ["59"]
