@@ -1,8 +1,8 @@
 '''
----------------------------------------------------------------------------------------
---	SCRIPT:		    remoteFirewall.py
+--------------------------------------------------------------------------------------------
+--	SCRIPT:	    remoteFirewall.py
 --
---	FUNCTIONS:		setupRouting
+--	FUNCTIONS:  setupRouting
 --                  firewallInit
 --                  createUserChains
 --                  dnsSetup
@@ -10,19 +10,20 @@
 --                  enableUDPPort
 --                  enableICMP
 --
---	DATE:			February 3, 2014
+--	DATE:       February 3, 2014
 --
---	REVISIONS:		(Date and Description)
+--	REVISIONS:  (Date and Description)
 --
---	DESIGNERS:		John Payment
---				
---	PROGRAMMER:		John Payment
+--	DESIGNERS:  John Payment
+--                  Jake Miner
 --
---	NOTES:
---	This program will setup a linux firewall using iptables. By default it blocks
---  everything that is not a dns lookup and requires the user to specify allowed
---  ports.
----------------------------------------------------------------------------------------
+--	PROGRAMMER: John Payment
+--                  Jake Miner
+--
+--	NOTES: This program will setup a linux firewall using iptables. By default it blocks
+--             everything that is not a dns lookup and requires the user to specify allowed
+--             ports.
+---------------------------------------------------------------------------------------------
 '''
 import os
 
