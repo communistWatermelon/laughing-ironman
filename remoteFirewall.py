@@ -100,13 +100,17 @@ def dnsSetup():
 	os.system("iptables -A OUTPUT -p udp --dport 53 -m state --state NEW,ESTABLISHED -j ACCEPT")
 	os.system("iptables -A INPUT -p udp --dport 67:68 -j ACCEPT")
 
+	os.system("iptables -A FORWARD -i " + inputInt  + " -o " + outputInt + " -p udp --sport 53 -m state --state ESTABLISHED -j ACCEPT")
+	os.system("iptables -A FORWARD -i " + outputInt + " -o " + inputInt  + " -p udp --dport 53 -m state --state NEW,ESTABLISHED -j ACCEPT")
+	os.system("iptables -A FORWARD -i " + inputInt  + " -o " + outputInt + " -p udp --dport 67:68 -j ACCEPT")
+
 def enableTCPPortIn(port):
 	os.system("iptables -A FORWARD -i " + inputInt  + " -o " + outputInt + " -p tcp --sport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
 	os.system("iptables -A FORWARD -i " + outputInt + " -o " + inputInt  + " -p tcp --dport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
 
 def enableTCPPortOut(port):
-	os.system("iptables -A FORWARD -i " + inputInt  + " -o " + outputInt + " -p tcp --sport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
-	os.system("iptables -A FORWARD -i " + outputInt + " -o " + inputInt  + " -p tcp --dport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
+	os.system("iptables -A FORWARD -i " + outputInt + " -o " + inputInt  + " -p tcp --sport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
+	os.system("iptables -A FORWARD -i " + inputInt  + " -o " + outputInt + " -p tcp --dport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
 
 def enableUDPPort(port):
 	arg1 = "iptables -A INPUT -p udp --sport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT"
