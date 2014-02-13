@@ -130,10 +130,6 @@ def enableICMP(type):
 def main():
 	while True:
 		os.system("clear")
-		print("T - add a TCP port to be forwarded")
-		print("A - add a TCP port to be forwarded and allow ACKs")
-		print("U - Add a UDP port to be forwarded")
-		print("I - Add an ICMP type yo be forwarded")
 		print("R - run script")
 		print("\n==TCP Ports==")
 		for i in tcpPorts:
@@ -151,19 +147,7 @@ def main():
 
 		choice = raw_input()
 		
-		if choice == 'T' or choice == "t":
-			print("Input port to be forwarded: ")
-			tcpPorts.append(raw_input())
-		elif choice == 'A' or choice == "a":
-			print("Input port to be forwarded: ")
-			ackPorts.append(raw_input())
-		elif choice == 'U' or choice == "u":
-			print("Input port to be forwarded: ")
-			udpPorts.append(raw_input())
-		elif choice == 'I' or choice == "i":
-			print("Input ICMP type to be forwarded: ")
-			icmpTypes.append(raw_input())
-		elif choice == 'R' or choice == "r":
+		if choice == 'R' or choice == "r":
 			#setupForwarding("192.168.10.1", "192.168.0.100")
 			firewallInit()
 			createUserChains()
