@@ -58,31 +58,6 @@ def setupForwarding():
 	os.system("iptables -A FORWARD -i " + inputInt + " -o " + outputInt + " -m state --state  NEW,ESTABLISHED,RELATED -j ACCEPT")
 	os.system("iptables -A FORWARD -i " + outputInt + " -o " + inputInt + " -m state --state  NEW,ESTABLISHED,RELATED -j ACCEPT")
 
-def firewallInit():
-	#Clearing old firewall rules
-	os.system("iptables -F")
-
-	#Setting default Behavior
-	os.system("iptables -P INPUT DROP")
-	os.system("iptables -P OUTPUT DROP")
-	os.system("iptables -P FORWARD DROP")
-
-	#Drops specifical edge-cases
-	os.system("iptables -A INPUT -p tcp --sport 0:1024 --dport 80 -j DROP")
-	os.system("iptables -A INPUT -p tcp --sport 0 -j DROP")
-	os.system("iptables -A OUTPUT -p tcp --sport 0 -j DROP")
-
-	os.system("iptables -p tcp --dport 32768:32775 -j DROP")
-	os.system("iptables -p udp --dport 32768:32775 -j DROP")
-	os.system("iptables -p tcp --dport 111 -j DROP")
-	os.system("iptables -p tcp --dport 515 -j DROP")
-	
-	#Blocking syn+ack packets
-	os.system("iptables -A INPUT -p tcp --syn --fin -j DROP")
-	#Blocking all telnet packets
-	os.system("iptables -p tcp --sport 23 -j DROP")
-	os.system("iptables -p tcp --dport 23 -j DROP")
-		
 def createUserChains():
 	os.system("iptables -N TCP")
 	os.system("iptables -N UserTCP")
@@ -101,6 +76,32 @@ def createUserChains():
 	os.system("iptables -p icmp -j ICMP")
 	os.system("iptables -A ICMP")
 	os.system("iptables -A UserICMP")
+
+def firewallInit():
+	#Clearing old firewall rules
+	os.system("iptables -F")
+
+	#Setting default Behavior
+	os.system("iptables -P INPUT DROP")
+	os.system("iptables -P OUTPUT DROP")
+	os.system("iptables -P FORWARD DROP")
+
+	#Drops specifical edge-cases
+	os.system("iptables -A TCP -p tcp --sport 0:1024 --dport 80 -j DROP")
+	os.system("iptables -A TCP -p tcp --sport 0 -j DROP")
+
+	os.system("iptables -A TCP -p tcp --dport 32768:32775 -j DROP")
+	os.system("iptables -A UDP -p udp --dport 32768:32775 -j DROP")
+	os.system("iptables -A TCP -p tcp --dport 137:139 -j DROP")
+	os.system("iptables -A UDP -p tcp --dport 137:139 -j DROP")
+	os.system("iptables -A TCP -p tcp --dport 111 -j DROP")
+	os.system("iptables -A TCP -p tcp --dport 515 -j DROP")
+	
+	#Blocking syn+ack packets
+	os.system("iptables -A TCP -p tcp --syn --fin -j DROP")
+	#Blocking all telnet packets
+	os.system("iptables -A TCP -p tcp --sport 23 -j DROP")
+	os.system("iptables -A TCP -p tcp --dport 23 -j DROP")
 
 def dnsSetup():
 	os.system("iptables -A INPUT -p udp --sport 53 -m state --state ESTABLISHED -j ACCEPT")
@@ -162,9 +163,9 @@ def main():
 		choice = raw_input()
 		
 		if choice == 'R' or choice == 'r':
-			#setupForwarding("192.168.10.1", "192.168.0.100")
-			firewallInit()
+			setupForwarding()
 			createUserChains()
+			firewallInit()
 			
 			for i in tcpPortsIn:
 				enableTCPPortIn(i)			
