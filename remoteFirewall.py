@@ -168,6 +168,7 @@ def main():
 				enableICMPOut(i)
 
 			os.system("iptables -A INPUT -p tcp --syn -j DROP")
+			os.system("iptables -A FORWARD -i " + inputInt  + " -o " + outputInt + " -p tcp --syn -j DROP")
 
 			dnsSetup()
 			print("Setup Complete\n")
