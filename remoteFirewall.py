@@ -36,8 +36,8 @@ USER DEFINED SECTION
 inputInt = "em1"
 outputInt = "p3p1"
 
-tcpPortsIn = ["23", "80", "443"]
-tcpPortsOut = ["23", "80", "443"]
+tcpPortsIn = ["22", "80", "443"]
+tcpPortsOut = ["22", "80", "443"]
 udpPortsIn = ["59"]
 udpPortsOut = ["59"]
 icmpTypesIn = ["59"]
@@ -94,12 +94,19 @@ def firewallInit():
 	os.system("iptables -A UDP -p udp --dport 32768:32775 -j DROP")
 	os.system("iptables -A TCP -p tcp --dport 137:139 -j DROP")
 	os.system("iptables -A UDP -p tcp --dport 137:139 -j DROP")
+	os.system("iptables -A TCP -p tcp --dport 1024:65535 -j DROP")
+	os.system("iptables -A UDP -p tcp --dport 1024:65535 -j DROP")
 	os.system("iptables -A TCP -p tcp --dport 111 -j DROP")
 	os.system("iptables -A TCP -p tcp --dport 515 -j DROP")
 	
 	#Blocking all telnet packets
 	os.system("iptables -A TCP -p tcp --sport 23 -j DROP")
 	os.system("iptables -A TCP -p tcp --dport 23 -j DROP")
+
+	#SSH Delay & FTP Throughput
+	os.system("iptables -A PREROUTING -t mangle -p tcp -sport ssh -j TOS --set-tos Minimized-Delay")
+	os.system("iptables -A PREROUTING -t mangle -p tcp -sport ftp -j TOS --set-tos Minimized-Delay")
+	os.system("iptables -A PREROUTING -t mangle -p tcp -sport ftp-data -j TOS --Maximize-Throughput")
 
 def dnsSetup():
 	os.system("iptables -A INPUT -p udp --sport 53 -m state --state ESTABLISHED -j ACCEPT")
