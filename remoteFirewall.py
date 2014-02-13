@@ -28,10 +28,11 @@
 import os
 
 """
-User Defined Section
+USER DEFINED SECTION
 """
 inputInt="em1"
 outputInt="p3p1"
+<<<<<<< HEAD
 tcpPortsIn = ["59"]
 tcpPortsOut = ["59"]
 ackPorts = ["59"]
@@ -41,12 +42,22 @@ icmpTypes = ["59"]
 """
 User Defined Section
 """
+=======
+tcpPortsIn = ["23", "80", "443"]
+tcpPortsOut = ["23", "80", "443"]
+udpPortsIn = ["59"]
+udpPortsOut = ["59"]
+icmpTypesIn = ["59"]
+icmpTypesOut = ["59"]
+>>>>>>> 3093585ef6170bc5ba242720b05cad1806e421ad
 
 internalIP = "192.168.10.0/24"
 externalIP = "192.168.0.11" 
 IgatewayIP = "192.168.10.1"
 OgatewayIP = "192.168.0.100"
-
+"""
+USER DEFINED SECTION
+"""
 
 def setupForwarding():
 	os.system("ifconfig " + outputInt + " " + igatewayIP + " up")
@@ -101,15 +112,13 @@ def dnsSetup():
 	os.system("iptables -A OUTPUT -p udp --dport 53 -m state --state NEW,ESTABLISHED -j ACCEPT")
 	os.system("iptables -A INPUT -p udp --dport 67:68 -j ACCEPT")
 
-def enableTCPPort(port):
-	arg1 = "iptables -A INPUT -p tcp --sport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT"
-	arg2 = "iptables -A INPUT -p tcp --dport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT"
-	arg3 = "iptables -A OUTPUT -p tcp --sport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT"
-	arg4 = "iptables -A OUTPUT -p tcp --dport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT"
-	os.system(arg1)
-	os.system(arg2)
-	os.system(arg3)
-	os.system(arg4)
+def enableTCPPortIn(port):
+	os.system("iptables -A FORWARD -i " + inputInt  + " -o " + outputInt + " -p tcp --sport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
+	os.system("iptables -A FORWARD -i " + outputInt + " -o " + inputInt  + " -p tcp --dport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
+
+def enableTCPPortOut(port):
+	os.system("iptables -A FORWARD -i " + inputInt  + " -o " + outputInt + " -p tcp --sport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
+	os.system("iptables -A FORWARD -i " + outputInt + " -o " + inputInt  + " -p tcp --dport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
 
 
 #jake
