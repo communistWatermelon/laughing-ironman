@@ -86,6 +86,9 @@ def firewallInit():
 	os.system("iptables -P OUTPUT DROP")
 	os.system("iptables -P FORWARD DROP")
 
+	#Dropping Suspicious IP Addresses
+	os.system("iptables -s " + internalIP + " -i " + inputInt + " -j DROP")
+
 	#Drops specifical edge-cases
 	os.system("iptables -A TCP -p tcp --sport 0:1024 --dport 80 -j DROP")
 	os.system("iptables -A TCP -p tcp --sport 0 -j DROP")
