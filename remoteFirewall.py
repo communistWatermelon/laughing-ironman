@@ -58,8 +58,8 @@ def setupForwarding():
 	os.system("route add -net " + internalIP + " gw " + IgatewayIP)
 
 	os.system("iptables -t nat -A POSTROUTING -o " + inputInt + " -j MASQUERADE")
-	os.system("iptables -A FORWARD -i " + inputInt + " -o " + outputInt + " -m state --state  NEW,ESTABLISHED,RELATED -j ACCEPT")
-	os.system("iptables -A FORWARD -i " + outputInt + " -o " + inputInt + " -m state --state  NEW,ESTABLISHED,RELATED -j ACCEPT")
+	os.system("iptables -A FORWARD -i " + inputInt + " -o " + outputInt + " -m state --state  NEW,ESTABLISHED -j ACCEPT")
+	os.system("iptables -A FORWARD -i " + outputInt + " -o " + inputInt + " -m state --state  NEW,ESTABLISHED -j ACCEPT")
 
 def createUserChains():
 	os.system("iptables -N TCP")
@@ -104,9 +104,9 @@ def firewallInit():
 	os.system("iptables -A TCP -p tcp --dport 23 -j DROP")
 
 	#SSH Delay & FTP Throughput
-	os.system("iptables -A PREROUTING -t mangle -p tcp -sport ssh -j TOS --set-tos Minimized-Delay")
-	os.system("iptables -A PREROUTING -t mangle -p tcp -sport ftp -j TOS --set-tos Minimized-Delay")
-	os.system("iptables -A PREROUTING -t mangle -p tcp -sport ftp-data -j TOS --Maximize-Throughput")
+	os.system("iptables -A PREROUTING -t mangle -p tcp --sport 22 -j TOS --set-tos Minimize-Delay")
+	os.system("iptables -A PREROUTING -t mangle -p tcp --sport 21 -j TOS --set-tos Minimize-Delay")
+	os.system("iptables -A PREROUTING -t mangle -p tcp --sport 20 -j TOS --set-tos Maximize-Throughput")
 
 def dnsSetup():
 	os.system("iptables -A INPUT -p udp --sport 53 -m state --state ESTABLISHED -j ACCEPT")
