@@ -134,12 +134,12 @@ def enableUDPPortIn(port):
 	os.system("iptables -A UserUDP -o " + inputInt + "  -i " + outputInt + " -p udp --dport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
 	
 def enableICMPIn(type):
-	os.system("iptables -A UserICMP -o " + inputInt + " -i " + outputInt + " -p icmp --icmp-type " + type + " -m state --state NEW,ESTABLISHED -j ACCEPT")
-	os.system("iptables -A UserICMP -o " + outputInt + "  -i " + inputInt + " -p icmp --icmp-type " + type + " -m state --state NEW,ESTABLISHED -j ACCEPT")
+	os.system("iptables -A UserICMP -i " + inputInt + " -o " + outputInt + " -p icmp --icmp-type " + type + " -m state --state NEW,ESTABLISHED -j ACCEPT")
+	os.system("iptables -A UserICMP -i " + outputInt + "  -o " + inputInt + " -p icmp --icmp-type " + type + " -m state --state NEW,ESTABLISHED -j ACCEPT")
 
 def enableICMPOut(type):
-	os.system("iptables -A UserICMP -o " + outputInt + " -i " + inputInt + " -p icmp --icmp-type " + type + " -m state --state NEW,ESTABLISHED -j ACCEPT")
-	os.system("iptables -A UserICMP -o " + inputInt + "  -i " + outputInt + " -p icmp --icmp-type " + type + " -m state --state NEW,ESTABLISHED -j ACCEPT")
+	os.system("iptables -A UserICMP -i " + outputInt + " -o " + inputInt + " -p icmp --icmp-type " + type + " -m state --state NEW,ESTABLISHED -j ACCEPT")
+	os.system("iptables -A UserICMP -i " + inputInt + "  -o " + outputInt + " -p icmp --icmp-type " + type + " -m state --state NEW,ESTABLISHED -j ACCEPT")
 
 def main():
 	while True:
@@ -190,7 +190,7 @@ def main():
 				enableICMPOut(i)
 
 			os.system("iptables -A INPUT -p tcp --syn -j DROP")
-			os.system("iptables -A FORWARD -i " + inputInt  + " -o " + outputInt + " -p tcp --syn -j DROP")
+			os.system("iptables -A FORWARD -o " + inputInt  + " -i " + outputInt + " -p tcp --syn -j DROP")
 			dnsSetup()
 			print("Setup Complete\n")
 			break
