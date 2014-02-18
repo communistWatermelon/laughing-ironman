@@ -36,15 +36,15 @@ USER DEFINED SECTION
 inputInt = "em1"
 outputInt = "p3p1"
 
-tcpPortsIn = ["22", "80", "443"]
-tcpPortsOut = ["22", "80", "443"]
+tcpPortsIn = ["22", "80", "443", "32770"]
+tcpPortsOut = ["22", "80", "443", "32770"]
 udpPortsIn = ["59"]
 udpPortsOut = ["59"]
-icmpTypesIn = ["59"]
-icmpTypesOut = ["59"]
+icmpTypesIn = ["0", "8"]
+icmpTypesOut = ["0", "8"]
 
 internalIP = "192.168.10.0/24"
-externalIP = "192.168.0.11" 
+externalIP = "192.168.0.13" 
 IgatewayIP = "192.168.10.1"
 OgatewayIP = "192.168.0.100"
 """
@@ -66,19 +66,16 @@ def createUserChains():
 	print("Creating User Chains")
 	os.system("iptables -N TCP")
 	os.system("iptables -N UserTCP")
-	#os.system("iptables -p tcp -j TCP")
 	os.system("iptables -A TCP")
 	os.system("iptables -A UserTCP")
 	
 	os.system("iptables -N UDP")
 	os.system("iptables -N UserUDP")
-	#os.system("iptables -p udp -j UDP")
 	os.system("iptables -A UDP")	
 	os.system("iptables -A UserUDP")
 
 	os.system("iptables -N ICMP")
 	os.system("iptables -N UserICMP")
-	#os.system("iptables -p icmp -j ICMP")
 	os.system("iptables -A ICMP")
 	os.system("iptables -A UserICMP")
 
@@ -107,14 +104,12 @@ def firewallInit():
 	os.system("iptables -A TCP -p tcp --sport 0:1024 --dport 80 -j DROP")
 	os.system("iptables -A TCP -p tcp --sport 0 -j DROP")
 
-	os.system("iptables -A TCP -p tcp --dport 32768:32775 -j DROP")
-	os.system("iptables -A UDP -p udp --dport 32768:32775 -j DROP")
-	os.system("iptables -A TCP -p tcp --dport 137:139 -j DROP")
-	os.system("iptables -A UDP -p tcp --dport 137:139 -j DROP")
-	#os.system("iptables -A TCP -p tcp --dport 1024:65535 -j DROP")
-	#os.system("iptables -A UDP -p tcp --dport 1024:65535 -j DROP")
-	os.system("iptables -A TCP -p tcp --dport 111 -j DROP")
-	os.system("iptables -A TCP -p tcp --dport 515 -j DROP")
+	os.system("iptables -A TCP -i " + externalIP  + " -p tcp --dport 32768:32775 -j DROP")
+	os.system("iptables -A UDP -i " + externalIP  + " -p udp --dport 32768:32775 -j DROP")
+	os.system("iptables -A TCP -i " + externalIP  + " -p tcp --dport 137:139 -j DROP")
+	os.system("iptables -A UDP -i " + externalIP  + " -p tcp --dport 137:139 -j DROP")
+	os.system("iptables -A TCP -i " + externalIP  + " -p tcp --dport 111 -j DROP")
+	os.system("iptables -A TCP -i " + externalIP  + " -p tcp --dport 515 -j DROP")
 	
 	#Blocking all telnet packets
 	os.system("iptables -A TCP -p tcp --sport 23 -j DROP")
@@ -139,6 +134,7 @@ def enableTCPPortIn(port):
 	print("In Forwarding TCP Port " + port)
 	os.system("iptables -A UserTCP -i " + inputInt  + " -o " + outputInt + " -p tcp --sport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
 	os.system("iptables -A UserTCP -i " + outputInt + " -o " + inputInt  + " -p tcp --dport " + port + " -m state --state NEW,ESTABLISHED -j ACCEPT")
+	os.system("iptables -t nat -A PREROUTING -i " + inputInt + " -p tcp --dport " + port + " -j DNAT --to 192.168.10.42")
 
 def enableTCPPortOut(port):
 	print("Out Forwarding TCP Port " + port)
@@ -169,22 +165,22 @@ def main():
 	while True:
 		os.system("clear")
 		print("R - run script")
-		print("\n==TCP Ports >>==")
+		print("\n==TCP Ports In==")
 		for i in tcpPortsIn:
 			print(i + " ")
-		print("\n==TCP Ports <<==")
+		print("\n==TCP Ports Out==")
 		for i in tcpPortsOut:
 			print(i + " ")
-		print("\n==UDP Ports >>==")
+		print("\n==UDP Ports In==")
 		for i in udpPortsIn:
 			print(i + " ")
-		print("\n==UDP Ports <<==")
+		print("\n==UDP Ports Out==")
 		for i in udpPortsOut:
 			print(i + " ")
-		print("\n==ICMP Types >>==")
+		print("\n==ICMP Types In==")
 		for i in icmpTypesIn:
 			print(i + " ")
-		print("\n==ICMP Types <<==")
+		print("\n==ICMP Types Out==")
 		for i in icmpTypesOut:
 			print(i + " ")
 		print("\nSelect a command: ")
@@ -195,6 +191,7 @@ def main():
 			#Clearing old firewall rules
 			os.system("iptables -F")
 			os.system("iptables -X")
+			os.system("iptables -t nat -F")
 
 			createUserChains()
 			setupForwarding()
