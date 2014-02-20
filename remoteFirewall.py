@@ -44,7 +44,7 @@ tcpPortsIn = ["22", "80", "443", "32770"]
 tcpPortsOut = ["22", "80", "443", "32770"]
 udpPortsIn = ["59"]
 udpPortsOut = ["59"]
-icmpTypesIDEFINED()n = ["0", "8"]
+icmpTypesIn = ["0", "8"]
 icmpTypesOut = ["0", "8"]
 
 internalIP = "192.168.10.0/24"

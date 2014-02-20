@@ -19,12 +19,12 @@
 '''
 import os
 
-firewallIP = "192.168.0.xx"
+firewallIP = "192.168.0.13"
 clientIP   = "192.168.10.42" 
-outgoingIP = "192.168.0.12"
+outgoingIP = "192.168.0.3"
 
 #Can successfully complete a DNS lookup.
-os.system("host(http://google.com)")
+os.system("host google.com")
 
 #Drop outgoing TCP packets connecting from port 0
 os.system("hping " + outgoingIP + " -s 0 -p 22 -V")
@@ -65,6 +65,6 @@ os.system("firefox google.com")
 os.system("ssh 192.168.0.3")
 
 #Allowed ICMP Types are forwarded. 
-os.system("google.com")
-os.system(outgoingIP)
+os.system("ping google.com")
+os.system("ping " + outgoingIP)
 
