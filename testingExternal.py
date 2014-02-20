@@ -19,7 +19,7 @@
 '''
 import os
 
-firewallIP = "192.168.0.xx"
+firewallIP = "192.168.0.13"
 clientIP   = "192.168.10.42" 
 
 #Drop All packets with a destination address of the firewall machine that arrive from outside. 
